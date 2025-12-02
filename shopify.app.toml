@@ -1,8 +1,8 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
 client_id = "6aadfbb258f7e9349b401e3196ab7679"
-name = "prod-app"
-application_url = "https://example.com"
+name = "products-app"
+application_url = "https://app.enjob.ca"
 embedded = true
 
 [build]
