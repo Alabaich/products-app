@@ -1,0 +1,47 @@
+<div class="rich-product-data" data-handle="{{ product.handle }}" style="display: none; margin-top: 24px; padding-top: 24px; border-top: 1px solid #e1e3e5;">
+  
+  <div class="loading-spinner" style="text-align: center; padding: 20px; color: #666;">
+    Loading details...
+  </div>
+
+  <div id="external-content" class="rte"></div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const container = document.querySelector('.rich-product-data');
+    if (!container) return;
+
+    const handle = container.dataset.handle;
+    const spinner = container.querySelector('.loading-spinner');
+    const contentBox = document.getElementById('external-content');
+
+    // 1. Fetch from the App Proxy
+    // Note: We will configure '/apps/secure-data' in the next step
+    fetch(`/apps/secure-data?handle=${handle}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.found && data.html) {
+          // 2. Inject the HTML into the page
+          contentBox.innerHTML = data.html;
+          
+          // 3. Show the container, hide the spinner
+          container.style.display = 'block';
+          if (spinner) spinner.style.display = 'none';
+        } else {
+          console.log("No external data found for:", handle);
+        }
+      })
+      .catch(err => {
+        console.error("Failed to load rich data:", err);
+      });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Rich Description",
+  "target": "section",
+  "settings": []
+}
+{% endschema %}

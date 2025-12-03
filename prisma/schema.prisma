@@ -1,16 +1,10 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
-// Note that some adapters may set a maximum length for the String type by default, please ensure your strings are long
-// enough when changing adapters.
-// See https://www.prisma.io/docs/orm/reference/prisma-schema-reference#string for more information
 datasource db {
-  provider = "sqlite"
-  url      = "file:dev.sqlite"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Session {
@@ -29,4 +23,53 @@ model Session {
   locale        String?
   collaborator  Boolean?  @default(false)
   emailVerified Boolean?  @default(false)
+}
+
+model ScrapedProduct {
+  id             Int       @id @default(autoincrement())
+  handle         String    @unique(map: "unique_handle") @db.VarChar(300)
+  Title          String?
+  bodyHtml       String?   @map("Body (HTML)")
+  Vendor         String?   @db.VarChar(100)
+  Tags           String?
+  Option1_Name   String?   @map("Option1 Name") @db.VarChar(100)
+  Option2_Name   String?   @map("Option2 Name") @db.VarChar(100)
+  Option3_Name   String?   @map("Option3 Name") @db.VarChar(100)
+  Status         String?   @default("draft") @db.VarChar(50)
+  created_at     DateTime? @default(now()) @db.Timestamp(6)
+  updated_at     DateTime? @default(now()) @db.Timestamp(6)
+  all_image_srcs String[]
+  useful_links   Json?
+  debug_1        String?
+  Product_Type   String?   @map("Product Type") @db.VarChar(255)
+  Category       String?   @db.VarChar(255)
+
+  @@map("product_db")
+}
+
+model parsing_queue {
+  id         Int       @id @default(autoincrement())
+  vendor     String    @db.VarChar(50)
+  link       String    @unique(map: "unique_link") @db.VarChar(768)
+  category   String?   @db.VarChar(255)
+  status     String?   @default("pending") @db.VarChar(20)
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  updated_at DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model variant_db {
+  id                       Int       @id @default(autoincrement())
+  Variant_SKU              String    @unique(map: "unique_sku") @map("Variant SKU") @db.VarChar(255)
+  handle                   String?   @db.VarChar(300)
+  Option1_Value            String?   @map("Option1 Value") @db.VarChar(255)
+  Option2_Value            String?   @map("Option2 Value") @db.VarChar(255)
+  Option3_Value            String?   @map("Option3 Value") @db.VarChar(255)
+  Variant_Price            String?   @map("Variant Price") @db.VarChar(50)
+  Variant_Compare_At_Price String?   @map("Variant Compare At Price") @db.VarChar(50)
+  Variant_Barcode          String?   @map("Variant Barcode") @db.VarChar(100)
+  variant_image_src        String?
+  created_at               DateTime? @default(now()) @db.Timestamp(6)
+  updated_at               DateTime? @default(now()) @db.Timestamp(6)
+  Cost                     String?   @db.VarChar(50)
+  Variant_Grams            String?   @map("Variant Grams") @db.VarChar(50)
 }
